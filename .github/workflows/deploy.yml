@@ -80,7 +80,7 @@ jobs:
             sleep 2
             
             # Get the latest JAR file
-            JAR_FILE=\$(ls ~/rabitqproducer/app/rabitqproducer-0.0.1.*.jar | sort -V | tail -1)
+            JAR_FILE=\$(ls ~/rabitqproducer/app/rabitqproducer-0.0.1-SNAPSHOT.jar | sort -V | tail -1)
             
             # Start the application with environment variables
             nohup java -jar "\$JAR_FILE" \
