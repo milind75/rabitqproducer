@@ -83,14 +83,14 @@ jobs:
             # Start the application with environment variables
             nohup java -jar "\$JAR_FILE" \
               --spring.application.name=rabitqproducer \
-              --spring.rabbitmq.host=13.222.56.46 \
+              --spring.rabbitmq.host=localhost \
               --spring.rabbitmq.port=5672 \
-              --spring.rabbitmq.username=${{ env.RABBITMQ_USERNAME }} \
-              --spring.rabbitmq.password=${{ env.RABBITMQ_PASSWORD }} \
-              --spring.rabbitmq.virtual-host=${{ env.RABBITMQ_VHOST }} \
+              --spring.rabbitmq.username=${{ secrets.RABBITMQ_USERNAME }} \
+              --spring.rabbitmq.password=${{ secrets.RABBITMQ_PASSWORD }} \
+              --spring.rabbitmq.virtual-host=${{ secrets.RABBITMQ_VHOST }} \
               > ~/rabitqproducer/app/app.log 2>&1 &
             
-            sleep 3
+            sleep 10
             echo "Application started. Checking status..."
             
             # Check if process is running
@@ -98,6 +98,8 @@ jobs:
               echo "✓ Application is running"
             else
               echo "✗ Application failed to start"
+              echo "--- Last 50 lines of app.log ---"
+              tail -50 ~/rabitqproducer/app/app.log || true
               exit 1
             fi
           EOF
