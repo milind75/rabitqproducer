@@ -85,9 +85,9 @@ jobs:
               --spring.application.name=rabitqproducer \
               --spring.rabbitmq.host=13.222.56.46 \
               --spring.rabbitmq.port=5672 \
-              --spring.rabbitmq.username=${{ env.RABBITMQ_USERNAME:admin }} \
-              --spring.rabbitmq.password=${{ env.RABBITMQ_PASSWORD:admin123 }} \
-              --spring.rabbitmq.virtual-host=${{ env.RABBITMQ_VHOST:13.222.56.46 }} \
+              --spring.rabbitmq.username=${{ env.RABBITMQ_USERNAME }} \
+              --spring.rabbitmq.password=${{ env.RABBITMQ_PASSWORD }} \
+              --spring.rabbitmq.virtual-host=${{ env.RABBITMQ_VHOST }} \
               > ~/rabitqproducer/app/app.log 2>&1 &
             
             sleep 3
