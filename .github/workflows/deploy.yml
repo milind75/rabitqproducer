@@ -66,7 +66,7 @@ jobs:
       
       - name: Deploy JAR to EC2
         run: |
-          JAR_FILE=$(ls ./artifacts/rabitqproducer-*.jar | head -1)
+          JAR_FILE=$(ls ./artifacts/rabitqproducer-0.0.1.SNAPSHOT.jar | head -1)
           scp -i ~/.ssh/milkeyED.pem "$JAR_FILE" \
             ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com:~/rabitqproducer/app/
       
@@ -80,7 +80,7 @@ jobs:
             sleep 2
             
             # Get the latest JAR file
-            JAR_FILE=\$(ls ~/rabitqproducer/app/rabitqproducer-*.jar | sort -V | tail -1)
+            JAR_FILE=\$(ls ~/rabitqproducer/app/rabitqproducer-0.0.1.*.jar | sort -V | tail -1)
             
             # Start the application with environment variables
             nohup java -jar "\$JAR_FILE" \
