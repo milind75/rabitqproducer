@@ -38,11 +38,11 @@ jobs:
           retention-days: 5
 
   deploy:
+    name: Deploy to EC2
+    environment: prod
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    environment: prod
-    
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -53,24 +53,24 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > ~/.ssh/milkeyED.pem
+          chmod 600 ~/.ssh/milkeyED.pem
           ssh-keyscan -H ec2-13-222-56-46.compute-1.amazonaws.com >> ~/.ssh/known_hosts
       
       - name: Create app directory on EC2
         run: |
-          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
+          ssh -i ~/.ssh/milkeyED.pem ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
             "mkdir -p ~/rabitqproducer/app"
       
       - name: Deploy JAR to EC2
         run: |
           JAR_FILE=$(ls ./artifacts/rabitqproducer-*.jar | head -1)
-          scp -i ~/.ssh/id_ed25519 "$JAR_FILE" \
+          scp -i ~/.ssh/milkeyED.pem "$JAR_FILE" \
             ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com:~/rabitqproducer/app/
       
       - name: Stop and restart application on EC2
         run: |
-          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com << EOF
+          ssh -i ~/.ssh/milkeyED.pem ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com << EOF
             # Kill existing Java process
             pkill -f "java -jar" || true
             
@@ -104,7 +104,7 @@ jobs:
       
       - name: Verify deployment
         run: |
-          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
+          ssh -i ~/.ssh/milkeyED.pem ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
             "curl -s http://localhost:8080/swagger-ui.html | head -20 || echo 'Health check pending...'"
       
       - name: Deployment summary
