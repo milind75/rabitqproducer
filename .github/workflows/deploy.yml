@@ -52,29 +52,24 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ec2-13-222-56-46.compute-1.amazonaws.com >> ~/.ssh/known_hosts
       
       - name: Create app directory on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
+          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
             "mkdir -p ~/rabitqproducer/app"
       
       - name: Deploy JAR to EC2
         run: |
           JAR_FILE=$(ls ./artifacts/rabitqproducer-*.jar | head -1)
-          scp -i ~/.ssh/id_rsa "$JAR_FILE" \
-            ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com:~/rabitqproducer/app/
-      
-      - name: Deploy configuration file
-        run: |
-          scp -i ~/.ssh/id_rsa src/main/resources/application.yml \
+          scp -i ~/.ssh/id_ed25519 "$JAR_FILE" \
             ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com:~/rabitqproducer/app/
       
       - name: Stop and restart application on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com << EOF
             # Kill existing Java process
             pkill -f "java -jar" || true
             
@@ -82,10 +77,10 @@ jobs:
             sleep 2
             
             # Get the latest JAR file
-            JAR_FILE=$(ls ~/rabitqproducer/app/rabitqproducer-*.jar | sort -V | tail -1)
+            JAR_FILE=\$(ls ~/rabitqproducer/app/rabitqproducer-*.jar | sort -V | tail -1)
             
             # Start the application with environment variables
-            nohup java -jar "$JAR_FILE" \
+            nohup java -jar "\$JAR_FILE" \
               --spring.application.name=rabitqproducer \
               --spring.rabbitmq.host=13.222.56.46 \
               --spring.rabbitmq.port=5672 \
@@ -108,7 +103,7 @@ jobs:
       
       - name: Verify deployment
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
+          ssh -i ~/.ssh/id_ed25519 ubuntu@ec2-13-222-56-46.compute-1.amazonaws.com \
             "curl -s http://localhost:8080/swagger-ui.html | head -20 || echo 'Health check pending...'"
       
       - name: Deployment summary
