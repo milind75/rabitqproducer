@@ -34,7 +34,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rabitqproducer-jar
-          path: build/libs/rabitqproducer-*.jar
+          path: |
+            build/libs/*.jar
+            !build/libs/*-plain.jar
           retention-days: 5
 
   deploy:
@@ -85,9 +87,9 @@ jobs:
               --spring.application.name=rabitqproducer \
               --spring.rabbitmq.host=13.222.56.46 \
               --spring.rabbitmq.port=5672 \
-              --spring.rabbitmq.username=${{ env.RABBITMQ_USERNAME }} \
-              --spring.rabbitmq.password=${{ env.RABBITMQ_PASSWORD }} \
-              --spring.rabbitmq.virtual-host=${{ env.RABBITMQ_VHOST }} \
+              --spring.rabbitmq.username=${{ vars.RABBITMQ_USERNAME }} \
+              --spring.rabbitmq.password=${{ secrets.RABBITMQ_PASSWORD }} \
+              --spring.rabbitmq.virtual-host=${{ vars.RABBITMQ_VHOST }} \
               > ~/rabitqproducer/app/app.log 2>&1 &
             
             sleep 3
