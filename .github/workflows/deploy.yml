@@ -13,6 +13,10 @@ permissions:
 
 env:
   IMAGE_NAME: milind75/rabitqproducer
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: 014848113228
+  ECR_REPOSITORY: orderservice/rabitqproducer
+
 
 jobs:
   test:
@@ -53,15 +57,21 @@ jobs:
           username: ${{ vars.DOCKERHUB_LOGIN_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} \
+            | docker login --username AWS --password-stdin \
+              ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
       - name: Build, tag, and push image
         id: build-image
         run: |
-          IMAGE_URI="${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          docker build -t "$IMAGE_URI" .
-          docker tag "$IMAGE_URI" "${{ env.IMAGE_NAME }}:latest"
-          docker push "$IMAGE_URI"
-          docker push "${{ env.IMAGE_NAME }}:latest"
-          echo "image=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+          IMAGE_URI='${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}' 
+          docker build -t '$IMAGE_URI' .
+          docker tag '$IMAGE_URI' '${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest'
+          docker push '$IMAGE_URI'
+          docker push '${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest'          
+          echo "image=$IMAGE_URI" >> "$GITHUB_OUTPUT"  
 
   deploy:
     name: Deploy Image to EC2
@@ -83,7 +93,9 @@ jobs:
           ssh -i ~/.ssh/milkeyED.pem ubuntu@${{ vars.EC2_HOST }}.compute-1.amazonaws.com << EOF
             set -e
 
-            docker login -u "${{ vars.DOCKERHUB_LOGIN_USERNAME }}" --password-stdin <<< "${{ secrets.DOCKERHUB_TOKEN }}"
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} \
+            | docker login --username AWS --password-stdin \
+            ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
             docker pull "${{ needs.build-and-push.outputs.image }}"
 
             docker rm -f rabitqproducer || true
