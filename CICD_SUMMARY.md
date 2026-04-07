@@ -82,7 +82,7 @@ RABBITMQ_VHOST        → RabbitMQ virtual host (default: /)
 
 - [ ] **Commit and Push**
   ```bash
-  git add .github/workflows/deploy-ec2.yml CI_CD_SETUP.md GITHUB_SECRETS_SETUP.md
+  git add .github/workflows/deploy.yml CI_CD_SETUP.md GITHUB_SECRETS_SETUP.md
   git commit -m "Add GitHub Actions CI/CD pipeline"
   git push origin main
   ```
