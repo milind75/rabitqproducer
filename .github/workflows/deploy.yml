@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME }}/rabitqproducer
+  IMAGE_NAME: milind75/rabitqproducer
 
 jobs:
   test:
