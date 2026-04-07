@@ -2,11 +2,11 @@ spring:
   application:
     name: rabitqproducer
   rabbitmq:
-    host: 13.222.56.46
+    host: localhost
     port: 5672
     username: ${RABBITMQ_USERNAME:admin}
     password: ${RABBITMQ_PASSWORD:admin123}
-    virtual-host: ${RABBITMQ_VHOST:/}
+    virtual-host: localhost
     connection-timeout: 5000
 
 app:
