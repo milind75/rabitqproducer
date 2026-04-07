@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+build
+.gradle
+out
+*.iml
+*.log
+README.md
+CI_CD_SETUP.md
+CICD_SUMMARY.md
+GITHUB_SECRETS_SETUP.md
+scripts
+
