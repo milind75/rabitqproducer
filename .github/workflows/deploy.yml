@@ -15,7 +15,7 @@ permissions:
 env:
   IMAGE_NAME: milind75/rabitqproducer
   AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: 014848113228
+  AWS_ACCOUNT_ID: "014848113228"
   ECR_REPOSITORY: orderservice/rabitqproducer
 
 
