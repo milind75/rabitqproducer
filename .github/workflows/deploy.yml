@@ -82,7 +82,7 @@ jobs:
           ssh -i ~/.ssh/milkeyED.pem ubuntu@${{ vars.EC2_HOST }}.compute-1.amazonaws.com << EOF
             set -e
 
-            docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin <<< "${{ secrets.DOCKERHUB_TOKEN }}"
+            docker login -u "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin <<< "${{ secrets.DOCKERHUB_TOKEN }}"
             docker pull "${{ needs.build-and-push.outputs.image }}"
 
             docker rm -f rabitqproducer || true
